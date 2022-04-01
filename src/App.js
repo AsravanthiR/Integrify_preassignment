@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import Footer from "./components/Footer";
 
 // import { Route, BrowserRouter } from "react-router-dom";
 // import Layout from "./components/Layout";
@@ -88,6 +89,7 @@ export default function App() {
           <NotFound />
         </Route>
       </BrowserRouter>{" "} */}
+      {<Footer />}
     </div>
   );
 }
