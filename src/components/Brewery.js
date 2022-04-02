@@ -1,18 +1,62 @@
 import React from "react";
-import { Card, Button } from "react-bootstrap";
+import axios from "axios";
+import { Button } from "bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-const Brewery = ({ name, city, type }) => {
+import { Card } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Container } from "react-bootstrap";
+
+const Brewery = () => {
+  const [actualData, setActualData] = useState([]);
+  const [search, setSearch] = useState("");
+  const [searchData, setSearchData] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get(`https://api.openbrewerydb.org/breweries`)
+      .then((response) => {
+        const dataArray = response.data;
+        setActualData(dataArray);
+        setIsLoading(false);
+      })
+
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  function searchHandler(event) {
+    setSearch(event.target.value);
+    console.log(search);
+  }
+
+  function clearSearch() {
+    if (search !== "") {
+      setSearch("");
+      setSearchData([]);
+    }
+  }
+  const BreweryFilter = actualData.filter((brewery) => {
+    return brewery.name.toLowerCase().includes(search.toLocaleLowerCase());
+  });
   return (
     <div>
-      <Card bg="dark" text="light" key={name} className="brewerycard">
-        <Card.Header>{name.toUpperCase()}</Card.Header>
-
-        <LinkContainer to={`/${name}`}>
-          <Button variant="outline-secondary" size="sm">
-            More Info
-          </Button>
-        </LinkContainer>
-      </Card>
+      <input type="text" name="search" onChange={searchHandler} />
+      <Container className="card-container">
+        {!isLoading &&
+          BreweryFilter.map((brewery) => (
+            <Card className="card">
+              <p className="breweryname">{brewery.name}</p>
+              <p>{brewery.brewery_type}</p>
+              <p>{brewery.city}</p>
+              <LinkContainer to={`/${brewery.id}`}>
+                <button>Read more</button>
+              </LinkContainer>
+            </Card>
+          ))}
+      </Container>
     </div>
   );
 };
